@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Sahan Lakshan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<div class="admin-wrap">
+
+  <!-- LOGIN -->
+  <div id="loginView" class="admin-login">
+    <h1>Admin Login</h1>
+    <p class="muted">Sign in to manage portfolio data</p>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button class="btn btn-primary" type="submit">Log in</button>
+      <p class="form-status" id="loginStatus"></p>
+    </form>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="adminView" class="hidden">
+    <header class="admin-header">
+      <h1>Portfolio Admin</h1>
+      <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+    </header>
+
+    <nav class="tabs">
+      <button data-tab="certs" class="active">Certifications</button>
+      <button data-tab="projects">Projects</button>
+      <button data-tab="skills">Skills</button>
+      <button data-tab="stats">Hero Stats</button>
+    </nav>
+
+    <!-- ========== CERTIFICATIONS ========== -->
+    <section class="panel active" id="panel-certs">
+      <h2>Certifications</h2>
+      <form id="certForm" class="admin-form">
+        <input type="hidden" id="certId" />
+        <input type="text" id="certName" placeholder="Certificate name *" required />
+        <input type="text" id="certIssuer" placeholder="Issuer * (e.g. Microsoft)" required />
+        <div class="row">
+          <input type="text" id="certDomain" placeholder="Domain * (e.g. microsoft.com)" required />
+          <input type="text" id="certIssued" placeholder="Issued (e.g. Sep 2026)" />
+        </div>
+        <div class="row">
+          <input type="text" id="certTag" placeholder="Tag (e.g. Microsoft)" />
+          <input type="text" id="certFeatured" placeholder="Featured (e.g. LinkedIn Learning)" />
+        </div>
+        <div class="row">
+          <input type="text" id="certCredential" placeholder="Credential ID (optional)" />
+          <input type="number" id="certOrder" placeholder="Sort order" value="0" />
+        </div>
+        <input type="url" id="certUrl" placeholder="Certificate URL" />
+        <textarea id="certDesc" placeholder="Description" rows="3"></textarea>
+        <div class="row">
+          <button class="btn btn-primary" type="submit" id="certSaveBtn">Add Certificate</button>
+          <button class="btn btn-ghost hidden" type="button" id="certCancelBtn">Cancel edit</button>
+        </div>
+        <p class="form-status" id="certStatus"></p>
+      </form>
+      <div id="certList" class="admin-list"></div>
+    </section>
+
+    <!-- ========== PROJECTS ========== -->
+    <section class="panel" id="panel-projects">
+      <h2>Projects</h2>
+      <form id="projForm" class="admin-form">
+        <input type="hidden" id="projId" />
+        <input type="text" id="projTitle" placeholder="Project title *" required />
+        <input type="text" id="projSubtitle" placeholder="Subtitle" />
+        <textarea id="projDesc" placeholder="Description" rows="3"></textarea>
+        <div class="row">
+          <input type="text" id="projTags" placeholder="Tags (comma separated)" />
+          <input type="text" id="projStack" placeholder="Stack (comma separated)" />
+        </div>
+        <div class="row">
+          <input type="url" id="projLink" placeholder="Live / repo URL" />
+          <input type="number" id="projOrder" placeholder="Sort order" value="0" />
+        </div>
+        <div class="row">
+          <button class="btn btn-primary" type="submit" id="projSaveBtn">Add Project</button>
+          <button class="btn btn-ghost hidden" type="button" id="projCancelBtn">Cancel edit</button>
+        </div>
+        <p class="form-status" id="projStatus"></p>
+      </form>
+      <div id="projList" class="admin-list"></div>
+    </section>
+
+    <!-- ========== SKILLS ========== -->
+    <section class="panel" id="panel-skills">
+      <h2>Skills</h2>
+      <form id="skillForm" class="admin-form">
+        <input type="hidden" id="skillId" />
+        <input type="text" id="skillCategory" placeholder="Category * (e.g. Backend Development)" required />
+        <input type="text" id="skillName" placeholder="Skill name * (e.g. C#)" required />
+        <div class="row">
+          <input type="number" id="skillLevel" placeholder="Level 0-100 *" min="0" max="100" required />
+          <input type="number" id="skillOrder" placeholder="Sort order" value="0" />
+        </div>
+        <div class="row">
+          <button class="btn btn-primary" type="submit" id="skillSaveBtn">Add Skill</button>
+          <button class="btn btn-ghost hidden" type="button" id="skillCancelBtn">Cancel edit</button>
+        </div>
+        <p class="form-status" id="skillStatus"></p>
+      </form>
+      <div id="skillList" class="admin-list"></div>
+    </section>
+
+    <!-- ========== HERO STATS ========== -->
+    <section class="panel" id="panel-stats">
+      <h2>Hero Stats</h2>
+      <p class="muted">Key values: <code>qualification</code>, <code>institute</code>, <code>certifications</code>, <code>primary_stack</code></p>
+      <form id="statForm" class="admin-form">
+        <input type="hidden" id="statId" />
+        <input type="text" id="statKey" placeholder="Key * (qualification / institute / ...)" required />
+        <div class="row">
+          <input type="text" id="statLabel" placeholder="Label * (e.g. Qualification)" required />
+          <input type="text" id="statValue" placeholder="Value * (e.g. HND)" required />
+        </div>
+        <input type="text" id="statSub" placeholder="Subtitle (e.g. Computer Software Engineering)" />
+        <div class="row">
+          <button class="btn btn-primary" type="submit" id="statSaveBtn">Add / Update Stat</button>
+          <button class="btn btn-ghost hidden" type="button" id="statCancelBtn">Cancel edit</button>
+        </div>
+        <p class="form-status" id="statStatus"></p>
+      </form>
+      <div id="statList" class="admin-list"></div>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="admin.js"></script>
+</body>
+</html>
