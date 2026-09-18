@@ -1,6 +1,6 @@
 /* data-loader.js — fetches live data from Supabase and injects into the public site */
 
-const SUPABASE_URL  = 'https://ebxzzgghsufotwtctyxv.supabase.co/rest/v1/';
+const SUPABASE_URL  = 'https://ebxzzgghsufotwtctyxv.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_4ndt1T3Pkkh2DFjIVlYyHw_UV_3YsVL';
 
 const headers = {
