@@ -8,15 +8,22 @@ const headers = {
   Authorization: `Bearer ${SUPABASE_ANON}`
 };
 
-const fetchTable = (table, order = 'sort_order.asc') =>
-  fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&order=${order}`, { headers })
-    .then(r => r.json());
+const fetchTable = async (table, order = 'sort_order.asc') => {
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&order=${order}`;
+  const res = await fetch(url, { headers });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`[${table}] HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+};
 
-// ---------- CERTIFICATIONS ----------
+/* ---------------- CERTIFICATIONS ---------------- */
 async function loadCertifications() {
   const certs = await fetchTable('certifications', 'sort_order.asc');
   const grid = document.querySelector('#certifications .projects-grid');
-  if (!grid || !Array.isArray(certs)) return;
+  if (!grid) return;
+  if (!Array.isArray(certs)) return;
 
   grid.innerHTML = certs.map(c => `
     <article class="project-card">
@@ -35,25 +42,29 @@ async function loadCertifications() {
         ${c.issued ? `<span>Issued ${c.issued}</span>` : ''}
         ${c.credential ? `<span class="credential">ID: ${c.credential}</span>` : ''}
       </div>
-      ${c.url ? `<a class="btn btn-ghost" href="${c.url}" target="_blank" rel="noopener noreferrer">${c.credential && c.url.includes('scholarhat') ? 'Verify Certificate' : 'View Certificate'}</a>` : ''}
+      ${c.url ? `<a class="btn btn-ghost" href="${c.url}" target="_blank" rel="noopener noreferrer">${c.url.includes('scholarhat') ? 'Verify Certificate' : 'View Certificate'}</a>` : ''}
     </article>
   `).join('');
 
-  // Update hero cert counter
   const statEl = document.querySelector('#hero .stat-value[data-target]');
-  if (statEl) statEl.dataset.target = certs.length;
+  if (statEl) {
+    statEl.dataset.target = certs.length;
+    statEl.removeAttribute('data-target');
+    statEl.textContent = certs.length;
+  }
 }
 
-// ---------- PROJECTS ----------
+/* ---------------- PROJECTS ---------------- */
 async function loadProjects() {
   const projects = await fetchTable('projects', 'sort_order.asc');
   const grid = document.querySelector('#projects .projects-grid');
-  if (!grid || !Array.isArray(projects)) return;
+  if (!grid) return;
+  if (!Array.isArray(projects)) return;
 
   grid.innerHTML = projects.map(p => `
     <article class="project-card">
       <div class="project-tags">
-        ${(p.tags || []).map((t, i) => `<span class="${t.toLowerCase().includes('case') ? 'featured' : ''}">${t}</span>`).join('')}
+        ${(p.tags || []).map(t => `<span class="${t.toLowerCase().includes('case') ? 'featured' : ''}">${t}</span>`).join('')}
       </div>
       <h3>${p.title}</h3>
       ${p.subtitle ? `<p class="project-sub">${p.subtitle}</p>` : ''}
@@ -66,11 +77,12 @@ async function loadProjects() {
   `).join('');
 }
 
-// ---------- SKILLS ----------
+/* ---------------- SKILLS ---------------- */
 async function loadSkills() {
   const skills = await fetchTable('skills', 'category.asc,sort_order.asc');
   const grid = document.querySelector('#skills .skills-grid');
-  if (!grid || !Array.isArray(skills)) return;
+  if (!grid) return;
+  if (!Array.isArray(skills)) return;
 
   const byCat = {};
   skills.forEach(s => { (byCat[s.category] ||= []).push(s); });
@@ -87,7 +99,6 @@ async function loadSkills() {
     </div>
   `).join('');
 
-  // Re-trigger skill bar animation
   grid.querySelectorAll('.skill-group').forEach(g => {
     g.querySelectorAll('.bar i').forEach((bar, i) => {
       setTimeout(() => bar.classList.add('animate'), i * 120);
@@ -95,7 +106,7 @@ async function loadSkills() {
   });
 }
 
-// ---------- HERO STATS ----------
+/* ---------------- HERO STATS ---------------- */
 async function loadHeroStats() {
   const stats = await fetchTable('hero_stats', 'key.asc');
   if (!Array.isArray(stats)) return;
@@ -108,22 +119,24 @@ async function loadHeroStats() {
     const card = cards[i];
     if (!s || !card) return;
     card.querySelector('.stat-label').textContent = s.label;
-    card.querySelector('.stat-value').textContent = s.value;
     card.querySelector('.stat-sub').textContent   = s.sub || '';
-    // for the certifications counter, remove data-target so counter animation won't override
-    if (s.key === 'certifications') {
-      const val = card.querySelector('.stat-value');
-      if (val) val.removeAttribute('data-target');
+    const valEl = card.querySelector('.stat-value');
+    if (key === 'certifications') {
+      valEl.removeAttribute('data-target');
     }
+    valEl.textContent = s.value;
   });
 }
 
-// ---------- BOOT ----------
+/* ---------------- BOOT ---------------- */
 document.addEventListener('DOMContentLoaded', async () => {
-  await Promise.allSettled([
-    loadCertifications(),
-    loadProjects(),
-    loadSkills(),
-    loadHeroStats()
-  ]);
+  console.log('data-loader: starting');
+  try { await loadCertifications(); console.log('data-loader: certifications OK'); }
+  catch (e) { console.error('data-loader: certifications FAILED', e); }
+  try { await loadProjects();       console.log('data-loader: projects OK'); }
+  catch (e) { console.error('data-loader: projects FAILED', e); }
+  try { await loadSkills();         console.log('data-loader: skills OK'); }
+  catch (e) { console.error('data-loader: skills FAILED', e); }
+  try { await loadHeroStats();      console.log('data-loader: hero_stats OK'); }
+  catch (e) { console.error('data-loader: hero_stats FAILED', e); }
 });

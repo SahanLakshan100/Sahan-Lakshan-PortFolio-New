@@ -9,7 +9,7 @@ const $ = id => document.getElementById(id);
 const loginView = $('loginView');
 const adminView = $('adminView');
 
-// ================= AUTH =================
+/* ---------------- AUTH ---------------- */
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (session) showAdmin();
@@ -39,7 +39,7 @@ function showAdmin() {
   loadAll();
 }
 
-// ================= TABS =================
+/* ---------------- TABS ---------------- */
 document.querySelectorAll('.tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
@@ -49,7 +49,7 @@ document.querySelectorAll('.tabs button').forEach(btn => {
   });
 });
 
-// ================= HELPERS =================
+/* ---------------- HELPERS ---------------- */
 const flash = (id, msg, ok = true) => {
   const el = $(id);
   el.textContent = (ok ? '✓ ' : '✗ ') + msg;
@@ -61,14 +61,14 @@ const escapeHtml = s => String(s ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-// ================= LOAD ALL =================
+/* ---------------- LOAD ALL ---------------- */
 async function loadAll() {
   await Promise.all([loadCerts(), loadProjs(), loadSkills(), loadStats()]);
 }
 
-/* ============================================================
+/* ==========================================================
    CERTIFICATIONS
-   ============================================================ */
+   ========================================================== */
 async function loadCerts() {
   const { data, error } = await sb.from('certifications').select('*')
     .order('sort_order', { ascending: true })
@@ -139,9 +139,9 @@ function editCert(c) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ============================================================
+/* ==========================================================
    PROJECTS
-   ============================================================ */
+   ========================================================== */
 async function loadProjs() {
   const { data, error } = await sb.from('projects').select('*')
     .order('sort_order', { ascending: true })
@@ -206,9 +206,9 @@ function editProj(p) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ============================================================
+/* ==========================================================
    SKILLS
-   ============================================================ */
+   ========================================================== */
 async function loadSkills() {
   const { data, error } = await sb.from('skills').select('*')
     .order('category', { ascending: true })
@@ -267,9 +267,9 @@ function editSkill(s) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ============================================================
+/* ==========================================================
    HERO STATS
-   ============================================================ */
+   ========================================================== */
 async function loadStats() {
   const { data, error } = await sb.from('hero_stats').select('*')
     .order('key', { ascending: true });
@@ -299,7 +299,6 @@ $('statForm').addEventListener('submit', async e => {
   };
   const id = $('statId').value;
   $('statStatus').textContent = 'Saving…';
-  // upsert on key so adding same key updates it
   const { error } = id
     ? await sb.from('hero_stats').update(payload).eq('id', id)
     : await sb.from('hero_stats').upsert(payload, { onConflict: 'key' });
@@ -328,11 +327,11 @@ function editStat(s) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ============================================================
-   DELEGATED EDIT / DELETE HANDLER
-   ============================================================ */
-const TABLE_MAP = { cert: 'certifications', proj: 'projects', skill: 'skills', stat: 'hero_stats' };
-const EDIT_MAP  = { cert: editCert, proj: editProj, skill: editSkill, stat: editStat };
+/* ==========================================================
+   DELEGATED EDIT / DELETE
+   ========================================================== */
+const TABLE_MAP  = { cert: 'certifications', proj: 'projects', skill: 'skills', stat: 'hero_stats' };
+const EDIT_MAP   = { cert: editCert, proj: editProj, skill: editSkill, stat: editStat };
 const RELOAD_MAP = { cert: loadCerts, proj: loadProjs, skill: loadSkills, stat: loadStats };
 
 document.addEventListener('click', async e => {
