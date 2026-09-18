@@ -63,7 +63,7 @@ const escapeHtml = s => String(s ?? '')
 
 /* ---------------- LOAD ALL ---------------- */
 async function loadAll() {
-  await Promise.all([loadCerts(), loadProjs(), loadSkills(), loadStats()]);
+  await Promise.all([loadCerts(), loadProjs(), loadSkills(), loadExps(), loadStats()]);
 }
 
 /* ==========================================================
@@ -110,13 +110,11 @@ $('certForm').addEventListener('submit', async e => {
     : await sb.from('certifications').insert(payload);
   if (error) { $('certStatus').textContent = '✗ ' + error.message; return; }
   flash('certStatus', id ? 'Updated' : 'Added');
-  resetCert();
-  loadCerts();
+  resetCert(); loadCerts();
 });
 
 function resetCert() {
-  $('certForm').reset();
-  $('certId').value = '';
+  $('certForm').reset(); $('certId').value = '';
   $('certSaveBtn').textContent = 'Add Certificate';
   $('certCancelBtn').classList.add('hidden');
 }
@@ -180,13 +178,11 @@ $('projForm').addEventListener('submit', async e => {
     : await sb.from('projects').insert(payload);
   if (error) { $('projStatus').textContent = '✗ ' + error.message; return; }
   flash('projStatus', id ? 'Updated' : 'Added');
-  resetProj();
-  loadProjs();
+  resetProj(); loadProjs();
 });
 
 function resetProj() {
-  $('projForm').reset();
-  $('projId').value = '';
+  $('projForm').reset(); $('projId').value = '';
   $('projSaveBtn').textContent = 'Add Project';
   $('projCancelBtn').classList.add('hidden');
 }
@@ -244,13 +240,11 @@ $('skillForm').addEventListener('submit', async e => {
     : await sb.from('skills').insert(payload);
   if (error) { $('skillStatus').textContent = '✗ ' + error.message; return; }
   flash('skillStatus', id ? 'Updated' : 'Added');
-  resetSkill();
-  loadSkills();
+  resetSkill(); loadSkills();
 });
 
 function resetSkill() {
-  $('skillForm').reset();
-  $('skillId').value = '';
+  $('skillForm').reset(); $('skillId').value = '';
   $('skillSaveBtn').textContent = 'Add Skill';
   $('skillCancelBtn').classList.add('hidden');
 }
@@ -264,6 +258,71 @@ function editSkill(s) {
   $('skillOrder').value = s.sort_order || 0;
   $('skillSaveBtn').textContent = 'Update Skill';
   $('skillCancelBtn').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ==========================================================
+   EXPERIENCE
+   ========================================================== */
+async function loadExps() {
+  const { data, error } = await sb.from('experience').select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+  if (error) return;
+
+  $('expList').innerHTML = (data || []).map(x => `
+    <div class="admin-item">
+      <div>
+        <strong>${escapeHtml(x.role)}</strong>
+        <small>${escapeHtml(x.company)} · ${x.date_range || ''}</small>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-edit='${encodeURIComponent(JSON.stringify(x))}' data-type="exp">Edit</button>
+        <button class="btn btn-danger" data-del="${x.id}" data-type="exp">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+$('expForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const payload = {
+    role:       $('expRole').value.trim(),
+    company:    $('expCompany').value.trim(),
+    location:   $('expLocation').value.trim() || null,
+    date_range: $('expDate').value.trim() || null,
+    bullets:    $('expBullets').value.split('\n').map(s => s.trim()).filter(Boolean),
+    stack:      $('expStack').value.split(',').map(s => s.trim()).filter(Boolean),
+    sort_order: parseInt($('expOrder').value || '0', 10)
+  };
+  const id = $('expId').value;
+  $('expStatus').textContent = 'Saving…';
+  const { error } = id
+    ? await sb.from('experience').update(payload).eq('id', id)
+    : await sb.from('experience').insert(payload);
+  if (error) { $('expStatus').textContent = '✗ ' + error.message; return; }
+  flash('expStatus', id ? 'Updated' : 'Added');
+  resetExp(); loadExps();
+});
+
+function resetExp() {
+  $('expForm').reset(); $('expId').value = '';
+  $('expSaveBtn').textContent = 'Add Experience';
+  $('expCancelBtn').classList.add('hidden');
+}
+$('expCancelBtn').addEventListener('click', resetExp);
+
+function editExp(x) {
+  $('expId').value = x.id;
+  $('expRole').value = x.role || '';
+  $('expCompany').value = x.company || '';
+  $('expLocation').value = x.location || '';
+  $('expDate').value = x.date_range || '';
+  $('expBullets').value = (x.bullets || []).join('\n');
+  $('expStack').value = (x.stack || []).join(', ');
+  $('expOrder').value = x.sort_order || 0;
+  $('expSaveBtn').textContent = 'Update Experience';
+  $('expCancelBtn').classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -304,13 +363,11 @@ $('statForm').addEventListener('submit', async e => {
     : await sb.from('hero_stats').upsert(payload, { onConflict: 'key' });
   if (error) { $('statStatus').textContent = '✗ ' + error.message; return; }
   flash('statStatus', id ? 'Updated' : 'Saved');
-  resetStat();
-  loadStats();
+  resetStat(); loadStats();
 });
 
 function resetStat() {
-  $('statForm').reset();
-  $('statId').value = '';
+  $('statForm').reset(); $('statId').value = '';
   $('statSaveBtn').textContent = 'Add / Update Stat';
   $('statCancelBtn').classList.add('hidden');
 }
@@ -330,9 +387,9 @@ function editStat(s) {
 /* ==========================================================
    DELEGATED EDIT / DELETE
    ========================================================== */
-const TABLE_MAP  = { cert: 'certifications', proj: 'projects', skill: 'skills', stat: 'hero_stats' };
-const EDIT_MAP   = { cert: editCert, proj: editProj, skill: editSkill, stat: editStat };
-const RELOAD_MAP = { cert: loadCerts, proj: loadProjs, skill: loadSkills, stat: loadStats };
+const TABLE_MAP  = { cert: 'certifications', proj: 'projects', skill: 'skills', exp: 'experience', stat: 'hero_stats' };
+const EDIT_MAP   = { cert: editCert, proj: editProj, skill: editSkill, exp: editExp, stat: editStat };
+const RELOAD_MAP = { cert: loadCerts, proj: loadProjs, skill: loadSkills, exp: loadExps, stat: loadStats };
 
 document.addEventListener('click', async e => {
   const editBtn = e.target.closest('button[data-edit]');
@@ -342,7 +399,6 @@ document.addEventListener('click', async e => {
     EDIT_MAP[type]?.(data);
     return;
   }
-
   const delBtn = e.target.closest('button[data-del]');
   if (delBtn) {
     const type = delBtn.dataset.type;

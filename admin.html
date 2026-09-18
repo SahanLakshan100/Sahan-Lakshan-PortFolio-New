@@ -36,6 +36,7 @@
       <button data-tab="certs" class="active">Certifications</button>
       <button data-tab="projects">Projects</button>
       <button data-tab="skills">Skills</button>
+      <button data-tab="experience">Experience</button>
       <button data-tab="stats">Hero Stats</button>
     </nav>
 
@@ -112,6 +113,29 @@
         <p class="form-status" id="skillStatus"></p>
       </form>
       <div id="skillList" class="admin-list"></div>
+    </section>
+
+    <!-- ========== EXPERIENCE ========== -->
+    <section class="panel" id="panel-experience">
+      <h2>Experience</h2>
+      <form id="expForm" class="admin-form">
+        <input type="hidden" id="expId" />
+        <input type="text" id="expRole" placeholder="Role * (e.g. Intern - Digital)" required />
+        <div class="row">
+          <input type="text" id="expCompany" placeholder="Company * (e.g. MAS KREEDA VAANAVIL)" required />
+          <input type="text" id="expLocation" placeholder="Location (e.g. Kilinochchi)" />
+        </div>
+        <input type="text" id="expDate" placeholder="Date range (e.g. November 2025 – August 2026)" />
+        <textarea id="expBullets" placeholder="Bullet points — one per line" rows="5"></textarea>
+        <input type="text" id="expStack" placeholder="Stack (comma separated: C#, .NET, SQL Server)" />
+        <input type="number" id="expOrder" placeholder="Sort order" value="0" />
+        <div class="row">
+          <button class="btn btn-primary" type="submit" id="expSaveBtn">Add Experience</button>
+          <button class="btn btn-ghost hidden" type="button" id="expCancelBtn">Cancel edit</button>
+        </div>
+        <p class="form-status" id="expStatus"></p>
+      </form>
+      <div id="expList" class="admin-list"></div>
     </section>
 
     <!-- ========== HERO STATS ========== -->

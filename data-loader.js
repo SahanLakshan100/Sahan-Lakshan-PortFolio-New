@@ -22,8 +22,7 @@ const fetchTable = async (table, order = 'sort_order.asc') => {
 async function loadCertifications() {
   const certs = await fetchTable('certifications', 'sort_order.asc');
   const grid = document.querySelector('#certifications .projects-grid');
-  if (!grid) return;
-  if (!Array.isArray(certs)) return;
+  if (!grid || !Array.isArray(certs)) return;
 
   grid.innerHTML = certs.map(c => `
     <article class="project-card">
@@ -58,8 +57,7 @@ async function loadCertifications() {
 async function loadProjects() {
   const projects = await fetchTable('projects', 'sort_order.asc');
   const grid = document.querySelector('#projects .projects-grid');
-  if (!grid) return;
-  if (!Array.isArray(projects)) return;
+  if (!grid || !Array.isArray(projects)) return;
 
   grid.innerHTML = projects.map(p => `
     <article class="project-card">
@@ -81,8 +79,7 @@ async function loadProjects() {
 async function loadSkills() {
   const skills = await fetchTable('skills', 'category.asc,sort_order.asc');
   const grid = document.querySelector('#skills .skills-grid');
-  if (!grid) return;
-  if (!Array.isArray(skills)) return;
+  if (!grid || !Array.isArray(skills)) return;
 
   const byCat = {};
   skills.forEach(s => { (byCat[s.category] ||= []).push(s); });
@@ -106,6 +103,26 @@ async function loadSkills() {
   });
 }
 
+/* ---------------- EXPERIENCE ---------------- */
+async function loadExperience() {
+  const exps = await fetchTable('experience', 'sort_order.asc');
+  const timeline = document.querySelector('#experience .timeline');
+  if (!timeline || !Array.isArray(exps)) return;
+
+  timeline.innerHTML = exps.map(x => `
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        ${x.date_range ? `<span class="timeline-date">${x.date_range}${x.location ? ' · ' + x.location : ''}</span>` : ''}
+        <h3>${x.role}</h3>
+        <p class="company">${x.company} · Internship</p>
+        ${(x.bullets || []).length ? `<ul>${x.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : ''}
+        ${(x.stack || []).length ? `<div class="stack">${x.stack.map(s => `<span>${s}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
 /* ---------------- HERO STATS ---------------- */
 async function loadHeroStats() {
   const stats = await fetchTable('hero_stats', 'key.asc');
@@ -121,9 +138,7 @@ async function loadHeroStats() {
     card.querySelector('.stat-label').textContent = s.label;
     card.querySelector('.stat-sub').textContent   = s.sub || '';
     const valEl = card.querySelector('.stat-value');
-    if (key === 'certifications') {
-      valEl.removeAttribute('data-target');
-    }
+    if (key === 'certifications') valEl.removeAttribute('data-target');
     valEl.textContent = s.value;
   });
 }
@@ -137,6 +152,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   catch (e) { console.error('data-loader: projects FAILED', e); }
   try { await loadSkills();         console.log('data-loader: skills OK'); }
   catch (e) { console.error('data-loader: skills FAILED', e); }
+  try { await loadExperience();     console.log('data-loader: experience OK'); }
+  catch (e) { console.error('data-loader: experience FAILED', e); }
   try { await loadHeroStats();      console.log('data-loader: hero_stats OK'); }
   catch (e) { console.error('data-loader: hero_stats FAILED', e); }
 });

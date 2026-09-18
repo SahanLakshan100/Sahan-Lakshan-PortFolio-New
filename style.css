@@ -221,7 +221,7 @@ html.js .section, html.js .hero-stats {
 .about-card h3 { font-size: 1.2rem; }
 .about-card p { color: var(--muted); font-size: 0.95rem; }
 
-/* ===== PROJECTS ===== */
+/* ===== PROJECTS / CERTIFICATIONS CARDS ===== */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
