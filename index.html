@@ -471,14 +471,16 @@
     </div>
 
     <form class="contact-form" id="contactForm" action="https://formspree.io/f/xljdljyb" method="POST">
-      <input type="hidden" name="_subject" value="New message from your portfolio">
-      <input type="text"  name="name"    placeholder="Your Name"    required />
-      <input type="email" name="email"   placeholder="Your Email"   required />
-      <textarea           name="message" placeholder="Your Message" rows="5" required></textarea>
+  <input type="hidden" name="_subject" value="New message from your portfolio">
+  <input type="hidden" name="_template" value="table">
 
-      <button type="submit" class="btn btn-primary">Send Message</button>
-      <p class="form-status" id="formStatus"></p>
-    </form>
+  <input type="text"  name="name"    placeholder="Your Name"    required />
+  <input type="email" name="email"   placeholder="Your Email"   required />
+  <textarea           name="message" placeholder="Your Message" rows="5" required></textarea>
+
+  <button type="submit" class="btn btn-primary">Send Message</button>
+  <p class="form-status" id="formStatus"></p>
+</form>
   </div>
 </section>
 
@@ -500,18 +502,21 @@ document.getElementById("contactForm").addEventListener("submit", async function
   button.disabled = true;
 
   try {
+    const formData = new FormData(form);
     const response = await fetch(form.action, {
       method: "POST",
-      body: new FormData(form),
+      body: formData,
       headers: { Accept: "application/json" }
     });
+
+    const data = await response.json();
 
     if (response.ok) {
       status.textContent = "✅ Message sent successfully! I'll get back to you soon.";
       status.style.color = "#22c55e";
       form.reset();
     } else {
-      status.textContent = "❌ Something went wrong. Please try again.";
+      status.textContent = "❌ " + (data.errors ? data.errors.map(err => err.message).join(", ") : "Something went wrong.");
       status.style.color = "#ef4444";
     }
   } catch (err) {
