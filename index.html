@@ -89,7 +89,7 @@
 <!-- ===== ABOUT ===== -->
 <section id="about" class="section">
   <span class="section-tag">Get To Know Me</span>
-  <h2 class="section-title">About <span class="gradient-text">Your Name</span></h2>
+  <h2 class="section-title">About <span class="gradient-text">Sahan Lakshan</span></h2>
   <p class="section-sub">A Full-Stack Developer driven by clean code, optimized databases, and thoughtful design.</p>
 
   <div class="about-grid">
@@ -458,7 +458,7 @@
     <div class="contact-info">
       <div class="contact-item">
         <h4>Direct Email</h4>
-        <a href="mailto:youremail@example.com">sahanlakshan100@example.com</a>
+        <a href="mailto:sahanlakshan100@gmail.com">sahanlakshan100@gmail.com</a>
       </div>
       <div class="contact-item">
         <h4>Location &amp; Mobility</h4>
@@ -470,10 +470,12 @@
       </div>
     </div>
 
-    <form class="contact-form" id="contactForm">
-      <input type="text" placeholder="Your Name" required />
-      <input type="email" placeholder="Your Email" required />
-      <textarea rows="5" placeholder="Your Message" required></textarea>
+    <form class="contact-form" id="contactForm" action="https://formspree.io/f/xljdljyb" method="POST">
+      <input type="hidden" name="_subject" value="New message from your portfolio">
+      <input type="text"  name="name"    placeholder="Your Name"    required />
+      <input type="email" name="email"   placeholder="Your Email"   required />
+      <textarea           name="message" placeholder="Your Message" rows="5" required></textarea>
+
       <button type="submit" class="btn btn-primary">Send Message</button>
       <p class="form-status" id="formStatus"></p>
     </form>
@@ -486,5 +488,39 @@
 
 <script src="script.js"></script>
 <script src="data-loader.js"></script>
+<script>
+document.getElementById("contactForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const form = e.target;
+  const status = document.getElementById("formStatus");
+  const button = form.querySelector("button[type='submit']");
+
+  status.textContent = "Sending...";
+  status.style.color = "#888";
+  button.disabled = true;
+
+  try {
+    const response = await fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { Accept: "application/json" }
+    });
+
+    if (response.ok) {
+      status.textContent = "✅ Message sent successfully! I'll get back to you soon.";
+      status.style.color = "#22c55e";
+      form.reset();
+    } else {
+      status.textContent = "❌ Something went wrong. Please try again.";
+      status.style.color = "#ef4444";
+    }
+  } catch (err) {
+    status.textContent = "❌ Network error. Please try again.";
+    status.style.color = "#ef4444";
+  } finally {
+    button.disabled = false;
+  }
+});
+</script>
 </body>
 </html>
