@@ -64,15 +64,58 @@ window.addEventListener('load', () => {
   setTimeout(animateCounters, 300);
 });
 
-// // ===== Contact form (demo handler) =====
-// const form = document.getElementById('contactForm');
-// form?.addEventListener('submit', (e) => {
-//   e.preventDefault();
-//   const status = document.getElementById('formStatus');
-//   status.textContent = '✓ Message sent! (Connect this to Formspree, EmailJS, or your backend.)';
-//   form.reset();
-//   setTimeout(() => (status.textContent = ''), 5000);
-// });
+// ===== Contact form (Formspree) =====
+const contactForm = document.getElementById('contactForm');
+
+contactForm?.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  const status = document.getElementById('formStatus');
+  const button = contactForm.querySelector("button[type='submit']");
+
+  // Read values IMMEDIATELY into variables — before anything can reset them
+  const nameVal    = contactForm.querySelector('[name="name"]').value.trim();
+  const emailVal   = contactForm.querySelector('[name="email"]').value.trim();
+  const messageVal = contactForm.querySelector('[name="message"]').value.trim();
+
+  console.log("📤 Sending:", { nameVal, emailVal, messageVal });
+
+  status.textContent = "Sending...";
+  status.style.color = "#888";
+  button.disabled = true;
+
+  try {
+    const response = await fetch(contactForm.action, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        name:     nameVal,
+        email:    emailVal,
+        message:  messageVal,
+        _subject: "New message from your portfolio"
+      })
+    });
+
+    if (response.ok) {
+      status.textContent = "✅ Message sent successfully! I'll get back to you soon.";
+      status.style.color = "#22c55e";
+      contactForm.reset();
+    } else {
+      const data = await response.json().catch(() => ({}));
+      status.textContent = "❌ " + (data.errors ? data.errors.map(err => err.message).join(", ") : "Something went wrong.");
+      status.style.color = "#ef4444";
+    }
+  } catch (err) {
+    status.textContent = "❌ Network error. Please try again.";
+    status.style.color = "#ef4444";
+  } finally {
+    button.disabled = false;
+  }
+});
 
 // ===== Footer year =====
 document.getElementById('year').textContent = new Date().getFullYear();

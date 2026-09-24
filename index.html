@@ -486,51 +486,5 @@
 
 <script src="script.js"></script>
 <script src="data-loader.js"></script>
-<script>
-document.getElementById("contactForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const form = e.target;
-  const status = document.getElementById("formStatus");
-  const button = form.querySelector("button[type='submit']");
-
-  status.textContent = "Sending...";
-  status.style.color = "#888";
-  button.disabled = true;
-
-  // Build JSON manually — guarantees fields are sent
-  const payload = {
-    name:    form.querySelector('[name="name"]').value,
-    email:   form.querySelector('[name="email"]').value,
-    message: form.querySelector('[name="message"]').value,
-    _subject: "New message from your portfolio"
-  };
-
-  try {
-    const response = await fetch(form.action, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (response.ok) {
-      status.textContent = "✅ Message sent successfully! I'll get back to you soon.";
-      status.style.color = "#22c55e";
-      form.reset();
-    } else {
-      const data = await response.json().catch(() => ({}));
-      status.textContent = "❌ " + (data.errors ? data.errors.map(err => err.message).join(", ") : "Something went wrong.");
-      status.style.color = "#ef4444";
-    }
-  } catch (err) {
-    status.textContent = "❌ Network error. Please try again.";
-    status.style.color = "#ef4444";
-  } finally {
-    button.disabled = false;
-  }
-});
-</script>
 </body>
 </html>
