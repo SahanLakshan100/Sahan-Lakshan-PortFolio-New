@@ -64,15 +64,15 @@ window.addEventListener('load', () => {
   setTimeout(animateCounters, 300);
 });
 
-// ===== Contact form (demo handler) =====
-const form = document.getElementById('contactForm');
-form?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const status = document.getElementById('formStatus');
-  status.textContent = '✓ Message sent! (Connect this to Formspree, EmailJS, or your backend.)';
-  form.reset();
-  setTimeout(() => (status.textContent = ''), 5000);
-});
+// // ===== Contact form (demo handler) =====
+// const form = document.getElementById('contactForm');
+// form?.addEventListener('submit', (e) => {
+//   e.preventDefault();
+//   const status = document.getElementById('formStatus');
+//   status.textContent = '✓ Message sent! (Connect this to Formspree, EmailJS, or your backend.)';
+//   form.reset();
+//   setTimeout(() => (status.textContent = ''), 5000);
+// });
 
 // ===== Footer year =====
 document.getElementById('year').textContent = new Date().getFullYear();
